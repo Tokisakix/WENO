@@ -1,0 +1,7 @@
+torch
+torchvision
+tensorboardX
+numpy
+matplotlib
+scikit-learn
+scipy
