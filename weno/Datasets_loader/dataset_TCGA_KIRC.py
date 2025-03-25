@@ -15,7 +15,7 @@ import os
 import platform
 classes = ('blood', 'cancer', 'stroma', 'normal', 'empty', 'other')
 
-img_rows, img_cols = 256, 256
+img_rows, img_cols = 224, 224
 input_shape = (img_rows, img_cols, 3)
 
 
@@ -23,29 +23,39 @@ def get_TCGA_KIRC_data():
     # Load the raw TCGA KIRC data
     tcga_kirc_dir = 'data/tcga-kirc/'
     load_transforms = transforms.Resize((img_rows, img_cols))
-    test_rate = 0.15
+    
+    x_train_list = []
+    y_train_list = []
+    x_test_list  = []
+    y_test_list  = []
+    
+    for label_idx, class_name in enumerate(classes):
+        data_file = os.path.join(tcga_kirc_dir, f'batch_{class_name}.npz')
+        if not os.path.exists(data_file):
+            raise FileNotFoundError(f"Processed data file not found: {data_file}")
+            
+        data = np.load(data_file)
+        train_images = data['train']
+        test_images = data['test']
+        
+        x_train_list.append(train_images)
+        y_train_list.append(np.full(len(train_images), label_idx, dtype=np.int64))
+        
+        x_test_list.append(test_images)
+        y_test_list.append(np.full(len(test_images), label_idx, dtype=np.int64))
+    
+    x_train = np.concatenate(x_train_list, axis=0)
+    y_train = np.concatenate(y_train_list, axis=0)
+    x_test  = np.concatenate(x_test_list, axis=0)
+    y_test  = np.concatenate(y_test_list, axis=0)
 
-    x_train = []
-    y_train = []
-    x_test  = []
-    y_test  = []
-    for label in range(len(classes)):
-        class_name = classes[label]
-        for img_path in os.listdir(os.path.join(tcga_kirc_dir, class_name)):
-            img_path = os.path.join(tcga_kirc_dir, class_name, img_path)
-            img_tensor = torchvision.io.read_image(img_path)
-            img_tensor = load_transforms(img_tensor)
-            if random.random() <= test_rate:
-                x_test.append(img_tensor)
-                y_test.append(label)
-            else:
-                x_train.append(img_tensor)
-                y_train.append(label)
+    x_train = torch.from_numpy(x_train)
+    y_train = torch.from_numpy(y_train)
+    x_test  = torch.from_numpy(x_test)
+    y_test  = torch.from_numpy(y_test)
 
-    x_train = torch.stack(x_train)
-    y_train = torch.tensor(y_train)
-    x_test  = torch.stack(x_test)
-    y_test  = torch.tensor(y_test)
+    x_train = x_train.permute(0, 3, 1, 2)
+    x_test  = x_test.permute(0, 3, 1, 2)
 
     return x_train, y_train, x_test, y_test
 
@@ -192,7 +202,7 @@ class TCGA_KIRC_WholeSlide_challenge(torch.utils.data.Dataset):
 if __name__ == "__main__":
     # Invoke the above function to get our data.
     x_train, y_train,x_test, y_test = get_TCGA_KIRC_data()
-    # print(x_train.shape, y_train.shape, x_test.shape, y_test.shape)
+    print(x_train.shape, y_train.shape, x_test.shape, y_test.shape)
     # print(x_train[0])
 
     # for pos_slide_ratio in [0.01, 0.05, 0.1, 0.2, 0.3, 0.5]:

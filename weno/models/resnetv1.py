@@ -782,6 +782,12 @@ def resnet_CAMELYON_Encoder():
     return model
 
 
+def resnet_TCGA_KIRC_Encoder():
+    # NCT include images of size 224x224x3
+    model = ResNet_224x224_Encoder(BasicBlock, [2, 2, 2, 2], num_classes=[2])
+    return model
+
+
 def teacher_Attention_head(bn=True, num_classes=[2], init=True, input_feat_dim=512):
     model = Bag_Classifier_Attention_Head(num_classes=num_classes, init=init, input_feat_dim=input_feat_dim)
     return model
