@@ -541,10 +541,7 @@ if __name__ == "__main__":
     # random.seed(args.seed)
     # np.random.seed(args.seed)
 
-    name = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")+"_%s" % args.comment.replace('/', '_') + \
-           "_Seed{}_Bs{}_lr{}_BagLength{}_PosPatchRatio{}_PLPostProcessBy{}_StuFilterType{}_smoothE{}_weightN{}".format(
-               args.seed, args.batch_size, args.lr, args.bag_length, args.pos_patch_ratio,
-               args.PLPostProcessMethod, args.StuFilterType, args.smoothE, args.stu_loss_weight_neg)
+    name = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")+"_%s" % args.comment.replace('/', '_')
     try:
         args.device = [int(item) for item in args.device.split(',')]
     except AttributeError:
@@ -554,7 +551,7 @@ if __name__ == "__main__":
 
     print(name, flush=True)
 
-    writer = SummaryWriter('./runs_CIFAR/%s'%name)
+    writer = SummaryWriter('./runs/runs_CIFAR/%s'%name)
     writer.add_text('args', " \n".join(['%s %s' % (arg, getattr(args, arg)) for arg in vars(args)]))
 
     # Setup model

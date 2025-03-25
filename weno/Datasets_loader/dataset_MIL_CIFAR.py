@@ -56,7 +56,7 @@ def load_CIFAR10(ROOT):
 
 def get_CIFAR10_data():
     # Load the raw CIFAR-10 data
-    cifar10_dir = ''
+    cifar10_dir = 'data/cifar-10-batches-py/'
     x_train, y_train, X_test, y_test = load_CIFAR10(cifar10_dir)
     x_train, y_train, X_test, y_test = torch.from_numpy(x_train), torch.from_numpy(y_train), \
                                        torch.from_numpy(X_test), torch.from_numpy(y_test)
